@@ -16,7 +16,7 @@ faces = fetch_olivetti_faces(data_home='./data/Facedata', shuffle=True)
 X = faces.data                  # 图像数据（每张图像已展平为 4096 维向量）
 y = faces.target                # 标签（0-39，共40人）
 
-# 按标签分层抽样拆分（确保每个人的图像均匀分布）
+# 拆分训练集、测试集
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, 
     test_size=0.2,              # 测试集比例
@@ -33,9 +33,9 @@ class NeuralNetwork(nn.Module):
         self.flatten =nn.Flatten()
         self.linear_relu_stack= nn.Sequential(
             nn.Linear(4096, 8192),
-            nn.BatchNorm1d(8192),                       #归一化
+            nn.BatchNorm1d(8192),                       #归一化处理
             nn.ReLU(),
-            nn.Dropout(0.5),                            #正则化
+            nn.Dropout(0.5),                            #正则化处理
             nn.Linear(8192, 16384),
             nn.BatchNorm1d(16384), 
             nn.ReLU(),
@@ -76,16 +76,17 @@ layer1 = nn.Linear(in_features=64*64,out_features=10)   #定义并应用了一�
 hidden1 = layer1(flat_image)
 hidden1 = nn.ReLU()(hidden1)
 
-seg_modules =nn.Sequential(                             #数据按照容器中定义的顺序（确保前一个模块输出大小和下一个模块输入大小保持一致）通过所有模块
-    flatten,
-    layer1,
-    nn.ReLU(),
-    nn.Linear(10, 10)
-)
+# 定义模型
+#seg_modules =nn.Sequential(                             #数据按照容器中定义的顺序（确保前一个模块输出大小和下一个模块输入大小保持一致）通过所有模块
+#    flatten,
+#    layer1,
+#    nn.ReLU(),
+#    nn.Linear(10, 10)
+#)
+seg_modules = NeuralNetwork()
 
 input_image = torch.rand(10,64,64)                      #生成随机张量
 logits = seg_modules(input_image)
-
 softmax = nn.Softmax(dim=1)                             ## 神经网络的最后一个线性层返回的是logits类型的值，它们的取值是[-∞, ∞]。 把这些值传递给nn.Softmax模块。dim 参数指示我们在向量的哪个维度中计算softmax的值(和为1) 。
 pred_probab = softmax(logits)
 
@@ -138,7 +139,7 @@ def test(dataloader, model, loss_fn):
     print(f"Accuracy:{(100*correct):>0.2f}%, Avg loss:{test_loss:>10f}\n")
 
 # 多轮训练
-epochs = 30
+epochs = 20
 for t in range(epochs):
     print(f"Epoch {t+1}: ")
     train(t, train_dataloader, model, loss_fn, optimizer)   # 传入 DataLoader
