@@ -67,7 +67,6 @@ test_dataset = TensorDataset(X_test_tensor, y_test_tensor)
 train_dataloader = DataLoader(train_dataset, batch_size=128, shuffle=True)
 test_dataloader = DataLoader(test_dataset, batch_size=128)
 
-
 # 模型层分解,按层顺序构建模型
 input_image=torch.rand(10,64,64)                        #取出小批量样本
 flatten =nn.Flatten()                                   #将连续的维度范围展平成张量，即对输出进行处理，得到tensor类型的数据
