@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 import matplotlib as plt
 
-
 # Check the versions of the required libraries
 
 print("NumPy version:", np.__version__)
