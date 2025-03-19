@@ -21,3 +21,4 @@ probability = 1 / (1 + np.exp(-z))
 pred_class = 1 if probability > 0.5 else 0
 
 print(f"Predicted class: {pred_class}, Probability: {probability[0]:.4f}")
+
